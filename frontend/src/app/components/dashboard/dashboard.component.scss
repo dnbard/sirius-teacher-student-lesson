@@ -398,6 +398,60 @@
             font-weight: 600;
           }
         }
+
+        &.actions-cell {
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  thead {
+    th.actions-column {
+      text-align: center;
+    }
+  }
+}
+
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    stroke-width: 2;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.btn-delete {
+    background: #fee;
+    color: #e74c3c;
+
+    svg {
+      stroke: #e74c3c;
+    }
+
+    &:hover:not(:disabled) {
+      background: #e74c3c;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+
+      svg {
+        stroke: white;
       }
     }
   }

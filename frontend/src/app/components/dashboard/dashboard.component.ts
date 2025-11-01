@@ -82,6 +82,35 @@ export class DashboardComponent implements OnInit {
     return [...teacherRows, ...studentRows];
   }
 
+  deleteUser(user: UserTableRow): void {
+    // Show confirmation dialog
+    const confirmMessage = `Are you sure you want to delete ${user.role} "${user.name}"? This action cannot be undone.`;
+    
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    this.loading = true;
+
+    const deleteObservable = user.role === 'teacher' 
+      ? this.teachersService.delete(user.id)
+      : this.studentsService.delete(user.id);
+
+    deleteObservable.subscribe({
+      next: () => {
+        console.log(`${user.role} deleted successfully`);
+        // Remove from local data
+        this.usersTableData = this.usersTableData.filter(u => u.id !== user.id);
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error(`Error deleting ${user.role}:`, error);
+        alert(`Failed to delete ${user.role}. Please try again.`);
+        this.loading = false;
+      }
+    });
+  }
+
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {

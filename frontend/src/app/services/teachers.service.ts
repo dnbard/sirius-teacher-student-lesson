@@ -23,5 +23,11 @@ export class TeachersService {
       withCredentials: true
     });
   }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, {
+      withCredentials: true
+    });
+  }
 }
 

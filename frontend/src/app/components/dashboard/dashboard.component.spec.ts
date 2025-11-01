@@ -64,8 +64,8 @@ describe('DashboardComponent', () => {
       currentUser$: currentUserSubject.asObservable(),
     });
 
-    const teachersServiceSpy = jasmine.createSpyObj('TeachersService', ['getAll']);
-    const studentsServiceSpy = jasmine.createSpyObj('StudentsService', ['getAll']);
+    const teachersServiceSpy = jasmine.createSpyObj('TeachersService', ['getAll', 'delete']);
+    const studentsServiceSpy = jasmine.createSpyObj('StudentsService', ['getAll', 'delete']);
 
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -239,6 +239,44 @@ describe('DashboardComponent', () => {
 
       const experienceBadge = fixture.nativeElement.querySelector('.experience-badge');
       expect(experienceBadge).toBeNull();
+    });
+  });
+
+  describe('Delete functionality', () => {
+    it('should delete teacher after confirmation and remove from table', () => {
+      const mockAdmin = createMockUser(UserRole.ADMIN);
+      const mockTeachers = [createMockTeacher('1', 'John', 'Doe')];
+      const mockStudents = [createMockStudent('2', 'Jane', 'Smith')];
+
+      teachersService.getAll.and.returnValue(of(mockTeachers));
+      studentsService.getAll.and.returnValue(of(mockStudents));
+      teachersService.delete.and.returnValue(of(void 0));
+
+      currentUserSubject.next(mockAdmin);
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      // Verify initial state
+      expect(component.usersTableData.length).toBe(2);
+
+      // Mock confirm dialog to return true
+      spyOn(window, 'confirm').and.returnValue(true);
+
+      // Delete the teacher
+      const teacherToDelete = component.usersTableData[0];
+      component.deleteUser(teacherToDelete);
+
+      // Verify confirmation was shown
+      expect(window.confirm).toHaveBeenCalledWith(
+        'Are you sure you want to delete teacher "John Doe"? This action cannot be undone.'
+      );
+
+      // Verify delete was called with correct ID
+      expect(teachersService.delete).toHaveBeenCalledWith('1');
+
+      // Verify user was removed from table
+      expect(component.usersTableData.length).toBe(1);
+      expect(component.usersTableData[0].name).toBe('Jane Smith');
     });
   });
 });
