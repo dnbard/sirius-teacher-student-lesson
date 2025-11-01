@@ -27,6 +27,8 @@ export class DashboardComponent implements OnInit {
   loading: boolean = false;
   UserRole = UserRole;
   showAddUserModal: boolean = false;
+  showAssignStudentModal: boolean = false;
+  selectedTeacher: UserTableRow | null = null;
 
   constructor(
     private authService: AuthService,
@@ -93,6 +95,22 @@ export class DashboardComponent implements OnInit {
 
   onUserCreated(): void {
     this.loadUsersData();
+  }
+
+  openAssignStudentModal(teacher: UserTableRow): void {
+    console.log('Opening assign modal for teacher:', teacher);
+    this.selectedTeacher = teacher;
+    this.showAssignStudentModal = true;
+  }
+
+  closeAssignStudentModal(): void {
+    this.showAssignStudentModal = false;
+    this.selectedTeacher = null;
+  }
+
+  onStudentAssigned(): void {
+    // Optionally, you could reload data or show a success message
+    console.log('Student assigned successfully');
   }
 
   deleteUser(user: UserTableRow): void {

@@ -279,5 +279,46 @@ describe('DashboardComponent', () => {
       expect(component.usersTableData[0].name).toBe('Jane Smith');
     });
   });
+
+  describe('Assign student functionality', () => {
+    it('should open assign student modal when openAssignStudentModal is called', () => {
+      const mockTeacher = {
+        id: '1',
+        name: 'John Doe',
+        role: 'teacher' as const,
+        instrument: 'Piano',
+        experience: 5
+      };
+
+      component.openAssignStudentModal(mockTeacher);
+
+      expect(component.showAssignStudentModal).toBe(true);
+      expect(component.selectedTeacher).toEqual(mockTeacher);
+    });
+
+    it('should close assign student modal when closeAssignStudentModal is called', () => {
+      component.showAssignStudentModal = true;
+      component.selectedTeacher = {
+        id: '1',
+        name: 'John Doe',
+        role: 'teacher' as const,
+        instrument: 'Piano',
+        experience: 5
+      };
+
+      component.closeAssignStudentModal();
+
+      expect(component.showAssignStudentModal).toBe(false);
+      expect(component.selectedTeacher).toBeNull();
+    });
+
+    it('should log success message when student is assigned', () => {
+      spyOn(console, 'log');
+
+      component.onStudentAssigned();
+
+      expect(console.log).toHaveBeenCalledWith('Student assigned successfully');
+    });
+  });
 });
 

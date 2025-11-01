@@ -427,6 +427,10 @@
 
         &.actions-cell {
           text-align: center;
+          
+          button + button {
+            margin-left: 8px;
+          }
         }
       }
     }
@@ -460,6 +464,26 @@
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  &.btn-assign {
+    background: #e3f2fd;
+    color: #667eea;
+
+    svg {
+      stroke: #667eea;
+    }
+
+    &:hover:not(:disabled) {
+      background: #667eea;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+
+      svg {
+        stroke: white;
+      }
+    }
   }
 
   &.btn-delete {
