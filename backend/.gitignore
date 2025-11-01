@@ -4,3 +4,7 @@ dist
 *.log
 .DS_Store
 
+# Test coverage
+coverage
+*.lcov
+
