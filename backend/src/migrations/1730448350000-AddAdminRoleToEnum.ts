@@ -8,6 +8,7 @@ export class AddAdminRoleToEnum1730448350000 implements MigrationInterface {
     `);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async down(queryRunner: QueryRunner): Promise<void> {
     // Note: PostgreSQL doesn't support removing enum values directly
     // This would require recreating the enum and updating all references

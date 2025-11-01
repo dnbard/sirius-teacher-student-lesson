@@ -9,7 +9,13 @@
     "start:backend": "cd backend && npm run start:dev",
     "start:frontend": "cd frontend && npm start",
     "build:backend": "cd backend && npm run build",
-    "build:frontend": "cd frontend && npm run build"
+    "build:frontend": "cd frontend && npm run build",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test -- --watch=false --browsers=ChromeHeadless",
+    "test:cov": "npm run test:backend:cov && npm run test:frontend:cov",
+    "test:backend:cov": "cd backend && npm run test:cov",
+    "test:frontend:cov": "cd frontend && npm test -- --watch=false --code-coverage --browsers=ChromeHeadless"
   },
   "keywords": [],
   "author": "",

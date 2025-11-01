@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUUID, IsDateString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsUUID, IsDateString } from 'class-validator';
 import { LessonStatus } from '../entities/lesson.entity';
 
 export class CreateLessonDto {
