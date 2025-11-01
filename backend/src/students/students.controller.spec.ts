@@ -32,6 +32,7 @@ describe('StudentsController', () => {
 
   const mockStudentsService = {
     create: jest.fn(),
+    findAll: jest.fn(),
     findOne: jest.fn(),
     update: jest.fn(),
     remove: jest.fn(),
@@ -81,6 +82,18 @@ describe('StudentsController', () => {
 
       expect(result).toEqual(mockStudent);
       expect(service.create).toHaveBeenCalledWith(createStudentDto);
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all students', async () => {
+      const mockStudents = [mockStudent];
+      mockStudentsService.findAll.mockResolvedValue(mockStudents);
+
+      const result = await controller.findAll();
+
+      expect(result).toEqual(mockStudents);
+      expect(service.findAll).toHaveBeenCalled();
     });
   });
 

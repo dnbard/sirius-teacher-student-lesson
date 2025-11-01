@@ -68,6 +68,12 @@ export class TeachersService {
     }
   }
 
+  async findAll(): Promise<Teacher[]> {
+    return this.teachersRepository.find({
+      relations: ['user'],
+    });
+  }
+
   async findOne(id: string): Promise<Teacher> {
     const teacher = await this.teachersRepository.findOne({
       where: { id },

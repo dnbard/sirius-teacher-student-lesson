@@ -40,6 +40,13 @@ export class StudentsController {
     return this.studentsService.create(createStudentDto);
   }
 
+  @Get()
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.TEACHER)
+  findAll(): Promise<Student[]> {
+    return this.studentsService.findAll();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Student> {
     return this.studentsService.findOne(id);

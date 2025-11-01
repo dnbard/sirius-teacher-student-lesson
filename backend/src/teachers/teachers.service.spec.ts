@@ -55,6 +55,7 @@ describe('TeachersService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            find: jest.fn(),
             findOne: jest.fn(),
             remove: jest.fn(),
           },
@@ -128,6 +129,20 @@ describe('TeachersService', () => {
       await expect(service.create(createTeacherDto)).rejects.toThrow('Database error');
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.release).toHaveBeenCalled();
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all teachers', async () => {
+      const mockTeachers = [mockTeacher];
+      jest.spyOn(teacherRepository, 'find').mockResolvedValue(mockTeachers);
+
+      const result = await service.findAll();
+
+      expect(result).toEqual(mockTeachers);
+      expect(teacherRepository.find).toHaveBeenCalledWith({
+        relations: ['user'],
+      });
     });
   });
 

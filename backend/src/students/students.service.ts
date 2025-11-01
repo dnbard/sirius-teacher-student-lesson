@@ -67,6 +67,12 @@ export class StudentsService {
     }
   }
 
+  async findAll(): Promise<Student[]> {
+    return this.studentsRepository.find({
+      relations: ['user'],
+    });
+  }
+
   async findOne(id: string): Promise<Student> {
     const student = await this.studentsRepository.findOne({
       where: { id },

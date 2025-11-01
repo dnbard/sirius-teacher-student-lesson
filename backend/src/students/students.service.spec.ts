@@ -54,6 +54,7 @@ describe('StudentsService', () => {
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
+            find: jest.fn(),
             findOne: jest.fn(),
             remove: jest.fn(),
           },
@@ -126,6 +127,20 @@ describe('StudentsService', () => {
       await expect(service.create(createStudentDto)).rejects.toThrow('Database error');
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.release).toHaveBeenCalled();
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all students', async () => {
+      const mockStudents = [mockStudent];
+      jest.spyOn(studentRepository, 'find').mockResolvedValue(mockStudents);
+
+      const result = await service.findAll();
+
+      expect(result).toEqual(mockStudents);
+      expect(studentRepository.find).toHaveBeenCalledWith({
+        relations: ['user'],
+      });
     });
   });
 

@@ -39,6 +39,13 @@ export class TeachersController {
     return this.teachersService.create(createTeacherDto);
   }
 
+  @Get()
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  findAll(): Promise<Teacher[]> {
+    return this.teachersService.findAll();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Teacher> {
     return this.teachersService.findOne(id);
