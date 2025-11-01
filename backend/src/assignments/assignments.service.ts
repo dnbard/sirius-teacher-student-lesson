@@ -87,10 +87,27 @@ export class AssignmentsService {
       relations: ['student', 'student.user'],
     });
 
-    // Extract unique students from assignments
-    const students = assignments.map(assignment => assignment.student);
+    // Map students and include assignment ID in the student object
+    const students = assignments.map(assignment => {
+      const student = assignment.student;
+      // Add assignmentId to the student object
+      (student as any).assignmentId = assignment.id;
+      return student;
+    });
 
     return students;
+  }
+
+  async remove(id: string): Promise<void> {
+    const assignment = await this.assignmentsRepository.findOne({
+      where: { id },
+    });
+
+    if (!assignment) {
+      throw new NotFoundException(`Assignment with ID ${id} not found`);
+    }
+
+    await this.assignmentsRepository.remove(assignment);
   }
 }
 

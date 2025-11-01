@@ -22,6 +22,7 @@ describe('AssignmentsController', () => {
   const mockAssignmentsService = {
     create: jest.fn(),
     findStudentsByTeacher: jest.fn(),
+    remove: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -91,6 +92,27 @@ describe('AssignmentsController', () => {
       ).rejects.toThrow(ForbiddenException);
 
       expect(service.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('remove', () => {
+    const assignmentId = 'assignment-id';
+
+    it('should delete an assignment when user is admin', async () => {
+      mockAssignmentsService.remove.mockResolvedValue(undefined);
+
+      await controller.remove(assignmentId);
+
+      expect(service.remove).toHaveBeenCalledWith(assignmentId);
+    });
+
+    it('should call remove service method with correct id', async () => {
+      mockAssignmentsService.remove.mockResolvedValue(undefined);
+
+      await controller.remove(assignmentId);
+
+      expect(service.remove).toHaveBeenCalledTimes(1);
+      expect(service.remove).toHaveBeenCalledWith(assignmentId);
     });
   });
 });

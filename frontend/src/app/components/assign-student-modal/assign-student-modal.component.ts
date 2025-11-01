@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AssignmentsService } from '../../services/assignments.service';
+import { AssignmentsService, Assignment } from '../../services/assignments.service';
 import { StudentsService } from '../../services/students.service';
+import { TeachersService } from '../../services/teachers.service';
 import { Student } from '../../models/student.model';
 
 @Component({
@@ -11,6 +12,7 @@ import { Student } from '../../models/student.model';
 export class AssignStudentModalComponent implements OnInit {
   @Input() teacherId!: string;
   @Input() teacherName!: string;
+  @Input() assignedStudents: Student[] = [];
   @Output() closeModal = new EventEmitter<void>();
   @Output() studentAssigned = new EventEmitter<void>();
 
@@ -18,11 +20,13 @@ export class AssignStudentModalComponent implements OnInit {
   selectedStudentId: string = '';
   isLoading = false;
   isSubmitting = false;
+  isDeletingAssignmentId: string | null = null;
   errorMessage = '';
 
   constructor(
     private assignmentsService: AssignmentsService,
-    private studentsService: StudentsService
+    private studentsService: StudentsService,
+    private teachersService: TeachersService
   ) {}
 
   ngOnInit(): void {
@@ -84,6 +88,42 @@ export class AssignStudentModalComponent implements OnInit {
 
   getStudentFullName(student: Student): string {
     return `${student.user.firstName} ${student.user.lastName}`;
+  }
+
+  deleteAssignment(student: Student): void {
+    if (!student.assignmentId) {
+      console.error('Cannot delete assignment: assignmentId is missing');
+      return;
+    }
+
+    const confirmMessage = `Are you sure you want to remove "${this.getStudentFullName(student)}" from ${this.teacherName}?`;
+    
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    this.isDeletingAssignmentId = student.assignmentId;
+    this.errorMessage = '';
+
+    this.assignmentsService.delete(student.assignmentId).subscribe({
+      next: () => {
+        console.log('Assignment deleted successfully');
+        this.isDeletingAssignmentId = null;
+        // Remove from local list
+        this.assignedStudents = this.assignedStudents.filter(s => s.id !== student.id);
+        // Notify parent to refresh data
+        this.studentAssigned.emit();
+      },
+      error: (error) => {
+        this.isDeletingAssignmentId = null;
+        this.errorMessage = error.error?.message || 'Failed to delete assignment. Please try again.';
+        console.error('Error deleting assignment:', error);
+      }
+    });
+  }
+
+  isStudentAlreadyAssigned(studentId: string): boolean {
+    return this.assignedStudents.some(s => s.id === studentId);
   }
 }
 

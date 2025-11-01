@@ -193,6 +193,7 @@
     *ngIf="showAssignStudentModal && selectedTeacher"
     [teacherId]="selectedTeacher.id"
     [teacherName]="selectedTeacher.name"
+    [assignedStudents]="selectedTeacher.students || []"
     (closeModal)="closeAssignStudentModal()"
     (studentAssigned)="onStudentAssigned()">
   </app-assign-student-modal>

@@ -86,7 +86,12 @@ export class TeachersService {
         
         return {
           ...teacher,
-          students: assignments.map(assignment => assignment.student),
+          students: assignments.map(assignment => {
+            const student = assignment.student;
+            // Add assignmentId to the student object
+            (student as any).assignmentId = assignment.id;
+            return student;
+          }),
         };
       }),
     );
@@ -112,7 +117,12 @@ export class TeachersService {
 
     return {
       ...teacher,
-      students: assignments.map(assignment => assignment.student),
+      students: assignments.map(assignment => {
+        const student = assignment.student;
+        // Add assignmentId to the student object
+        (student as any).assignmentId = assignment.id;
+        return student;
+      }),
     } as any;
   }
 

@@ -2,6 +2,8 @@ import {
   Controller,
   Post,
   Body,
+  Delete,
+  Param,
   HttpCode,
   HttpStatus,
   UseGuards,
@@ -35,6 +37,14 @@ export class AssignmentsController {
     }
 
     return this.assignmentsService.create(createAssignmentDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async remove(@Param('id') id: string): Promise<void> {
+    await this.assignmentsService.remove(id);
   }
 }
 

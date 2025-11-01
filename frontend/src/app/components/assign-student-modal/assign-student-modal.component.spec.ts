@@ -44,7 +44,7 @@ describe('AssignStudentModalComponent', () => {
   ];
 
   beforeEach(async () => {
-    const assignmentsServiceSpy = jasmine.createSpyObj('AssignmentsService', ['create']);
+    const assignmentsServiceSpy = jasmine.createSpyObj('AssignmentsService', ['create', 'delete']);
     const studentsServiceSpy = jasmine.createSpyObj('StudentsService', ['getAll']);
 
     await TestBed.configureTestingModule({
@@ -145,6 +145,90 @@ describe('AssignStudentModalComponent', () => {
     const fullName = component.getStudentFullName(mockStudents[0]);
     
     expect(fullName).toBe('John Doe');
+  });
+
+  describe('Delete Assignment', () => {
+    it('should delete assignment successfully', () => {
+      const assignedStudent: Student = {
+        ...mockStudents[0],
+        assignmentId: 'assignment1'
+      };
+      
+      component.assignedStudents = [assignedStudent];
+      assignmentsService.delete.and.returnValue(of(undefined));
+      spyOn(component.studentAssigned, 'emit');
+      spyOn(window, 'confirm').and.returnValue(true);
+      
+      component.deleteAssignment(assignedStudent);
+      
+      expect(assignmentsService.delete).toHaveBeenCalledWith('assignment1');
+      expect(component.assignedStudents.length).toBe(0);
+      expect(component.studentAssigned.emit).toHaveBeenCalled();
+    });
+
+    it('should not delete assignment when user cancels confirmation', () => {
+      const assignedStudent: Student = {
+        ...mockStudents[0],
+        assignmentId: 'assignment1'
+      };
+      
+      component.assignedStudents = [assignedStudent];
+      spyOn(window, 'confirm').and.returnValue(false);
+      
+      component.deleteAssignment(assignedStudent);
+      
+      expect(assignmentsService.delete).not.toHaveBeenCalled();
+      expect(component.assignedStudents.length).toBe(1);
+    });
+
+    it('should handle error when deleting assignment', () => {
+      const assignedStudent: Student = {
+        ...mockStudents[0],
+        assignmentId: 'assignment1'
+      };
+      
+      const error = { error: { message: 'Failed to delete' } };
+      assignmentsService.delete.and.returnValue(throwError(() => error));
+      spyOn(window, 'confirm').and.returnValue(true);
+      
+      component.deleteAssignment(assignedStudent);
+      
+      expect(component.errorMessage).toBe('Failed to delete');
+      expect(component.isDeletingAssignmentId).toBeNull();
+    });
+
+    it('should not delete when assignmentId is missing', () => {
+      const assignedStudent: Student = {
+        ...mockStudents[0]
+        // No assignmentId
+      };
+      
+      spyOn(console, 'error');
+      
+      component.deleteAssignment(assignedStudent);
+      
+      expect(console.error).toHaveBeenCalledWith('Cannot delete assignment: assignmentId is missing');
+      expect(assignmentsService.delete).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('isStudentAlreadyAssigned', () => {
+    it('should return true if student is already assigned', () => {
+      const assignedStudent: Student = {
+        ...mockStudents[0],
+        assignmentId: 'assignment1'
+      };
+      
+      component.assignedStudents = [assignedStudent];
+      
+      expect(component.isStudentAlreadyAssigned('1')).toBe(true);
+    });
+
+    it('should return false if student is not assigned', () => {
+      component.assignedStudents = [];
+      
+      expect(component.isStudentAlreadyAssigned('1')).toBe(false);
+    });
   });
 });
 

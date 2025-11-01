@@ -12,8 +12,47 @@
 
     <div class="modal-body">
       <div class="teacher-info">
-        <p>Assigning student to: <strong>{{ teacherName }}</strong></p>
+        <p>Managing students for: <strong>{{ teacherName }}</strong></p>
       </div>
+
+      <!-- Assigned Students List -->
+      <div class="assigned-students-section" *ngIf="assignedStudents.length > 0">
+        <h3>Currently Assigned Students</h3>
+        <div class="assigned-students-list">
+          <div class="assigned-student-item" *ngFor="let student of assignedStudents">
+            <div class="student-info">
+              <svg class="student-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+              <div class="student-details">
+                <span class="student-name">{{ getStudentFullName(student) }}</span>
+                <span class="student-instrument">{{ student.instrument }}</span>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              class="btn-delete-assignment" 
+              (click)="deleteAssignment(student)"
+              [disabled]="isDeletingAssignmentId === student.assignmentId"
+              title="Remove student from teacher">
+              <svg *ngIf="isDeletingAssignmentId !== student.assignmentId" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+              <span *ngIf="isDeletingAssignmentId === student.assignmentId" class="spinner-small"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="no-assigned-students" *ngIf="assignedStudents.length === 0">
+        <p>No students assigned yet</p>
+      </div>
+
+      <div class="divider" *ngIf="!isLoading"></div>
 
       <div class="loading-indicator" *ngIf="isLoading">
         <div class="spinner"></div>
@@ -21,6 +60,7 @@
       </div>
 
       <form *ngIf="!isLoading" (ngSubmit)="onSubmit()">
+        <h3>Assign New Student</h3>
         <div class="form-group">
           <label for="student">Select Student</label>
           <select 
@@ -31,8 +71,12 @@
             [disabled]="isSubmitting"
             required>
             <option value="">-- Select a student --</option>
-            <option *ngFor="let student of students" [value]="student.id">
+            <option 
+              *ngFor="let student of students" 
+              [value]="student.id"
+              [disabled]="isStudentAlreadyAssigned(student.id)">
               {{ getStudentFullName(student) }} - {{ student.instrument }}
+              <span *ngIf="isStudentAlreadyAssigned(student.id)"> (Already assigned)</span>
             </option>
           </select>
         </div>

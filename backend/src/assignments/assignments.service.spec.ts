@@ -20,6 +20,7 @@ describe('AssignmentsService', () => {
     save: jest.fn(),
     findOne: jest.fn(),
     find: jest.fn(),
+    remove: jest.fn(),
   };
 
   const mockTeachersRepository = {
@@ -173,7 +174,7 @@ describe('AssignmentsService', () => {
   describe('findStudentsByTeacher', () => {
     const teacherId = 'teacher-id';
 
-    it('should return students for a teacher', async () => {
+    it('should return students for a teacher with assignmentId', async () => {
       const mockTeacher = {
         id: teacherId,
         instrument: 'Piano',
@@ -204,7 +205,10 @@ describe('AssignmentsService', () => {
 
       const result = await service.findStudentsByTeacher(teacherId);
 
-      expect(result).toEqual(mockStudents);
+      // Check that assignmentId was added to the student
+      expect(result).toHaveLength(1);
+      expect(result[0].id).toEqual('student-1');
+      expect((result[0] as any).assignmentId).toEqual('assignment-1');
       expect(teachersRepository.findOne).toHaveBeenCalledWith({
         where: { id: teacherId },
       });
@@ -232,6 +236,36 @@ describe('AssignmentsService', () => {
       const result = await service.findStudentsByTeacher(teacherId);
 
       expect(result).toEqual([]);
+    });
+  });
+
+  describe('remove', () => {
+    const assignmentId = 'assignment-id';
+
+    it('should delete an assignment successfully', async () => {
+      const mockAssignment = {
+        id: assignmentId,
+        teacherId: 'teacher-id',
+        studentId: 'student-id',
+        createdAt: new Date(),
+      };
+
+      mockAssignmentsRepository.findOne.mockResolvedValue(mockAssignment);
+      mockAssignmentsRepository.remove.mockResolvedValue(mockAssignment);
+
+      await service.remove(assignmentId);
+
+      expect(assignmentsRepository.findOne).toHaveBeenCalledWith({
+        where: { id: assignmentId },
+      });
+      expect(assignmentsRepository.remove).toHaveBeenCalledWith(mockAssignment);
+    });
+
+    it('should throw NotFoundException when assignment does not exist', async () => {
+      mockAssignmentsRepository.findOne.mockResolvedValue(null);
+
+      await expect(service.remove(assignmentId)).rejects.toThrow(NotFoundException);
+      expect(assignmentsRepository.remove).not.toHaveBeenCalled();
     });
   });
 });
