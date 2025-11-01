@@ -222,6 +222,214 @@
   }
 }
 
+.users-table-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+  overflow: hidden;
+
+  .card-header {
+    padding: 30px;
+    border-bottom: 1px solid #e1e8ed;
+
+    h3 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 8px 0;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 30px;
+    gap: 20px;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    p {
+      font-size: 16px;
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+}
+
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: #f8f9fa;
+
+    tr {
+      th {
+        padding: 16px 30px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e1e8ed;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color 0.2s ease;
+      border-bottom: 1px solid #f1f3f5;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 20px 30px;
+        color: #333;
+        font-size: 15px;
+
+        .name-cell {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .user-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            svg {
+              width: 20px;
+              height: 20px;
+              stroke-width: 2;
+            }
+
+            &.teacher-icon {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              
+              svg {
+                stroke: white;
+              }
+            }
+
+            &.student-icon {
+              background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+              
+              svg {
+                stroke: white;
+              }
+            }
+          }
+
+          .user-name {
+            font-weight: 600;
+            color: #333;
+          }
+        }
+
+        .role-badge {
+          display: inline-block;
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 13px;
+          font-weight: 600;
+          text-transform: capitalize;
+
+          &.role-teacher {
+            background: #e8eaf6;
+            color: #5e35b1;
+          }
+
+          &.role-student {
+            background: #fce4ec;
+            color: #c2185b;
+          }
+        }
+
+        .instrument-cell {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex-wrap: wrap;
+
+          .instrument-name {
+            font-weight: 500;
+            color: #333;
+          }
+
+          .experience-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #e3f2fd;
+            color: #1565c0;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 30px;
+  color: #999;
+
+  svg {
+    width: 64px;
+    height: 64px;
+    stroke: #ccc;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 16px;
+    color: #999;
+    margin: 0;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @media (max-width: 768px) {
   .navbar {
     .navbar-content {
@@ -270,6 +478,48 @@
 
       p {
         font-size: 14px;
+      }
+    }
+  }
+
+  .users-table-card {
+    .card-header {
+      padding: 20px;
+
+      h3 {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .users-table {
+    thead tr th {
+      padding: 12px 15px;
+      font-size: 11px;
+    }
+
+    tbody tr td {
+      padding: 15px;
+      font-size: 14px;
+
+      .name-cell {
+        gap: 8px;
+
+        .user-icon {
+          width: 32px;
+          height: 32px;
+
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+
+      .instrument-cell {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
       }
     }
   }
