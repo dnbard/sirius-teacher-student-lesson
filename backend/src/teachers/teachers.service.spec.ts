@@ -195,7 +195,6 @@ describe('TeachersService', () => {
     };
 
     it('should update a teacher successfully', async () => {
-      const updatedTeacher = { ...mockTeacher, ...updateTeacherDto };
       jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(mockTeacher);
       jest.spyOn(assignmentRepository, 'find').mockResolvedValue([]);
       mockQueryRunner.manager.save.mockResolvedValue(mockTeacher);

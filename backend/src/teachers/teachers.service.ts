@@ -4,7 +4,6 @@ import { Repository, DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Teacher } from '../users/entities/teacher.entity';
 import { User, UserRole } from '../users/entities/user.entity';
-import { Student } from '../users/entities/student.entity';
 import { Assignment } from '../users/entities/assignment.entity';
 import { CreateTeacherDto } from '../users/dto/create-teacher.dto';
 import { UpdateTeacherDto } from '../users/dto/update-teacher.dto';
