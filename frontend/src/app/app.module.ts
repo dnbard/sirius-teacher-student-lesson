@@ -9,6 +9,7 @@ import { LoginComponent } from './components/login/login.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { AddUserModalComponent } from './components/add-user-modal/add-user-modal.component';
 import { AssignStudentModalComponent } from './components/assign-student-modal/assign-student-modal.component';
+import { AddLessonModalComponent } from './components/add-lesson-modal/add-lesson-modal.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 
 @NgModule({
@@ -17,7 +18,8 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
     LoginComponent,
     DashboardComponent,
     AddUserModalComponent,
-    AssignStudentModalComponent
+    AssignStudentModalComponent,
+    AddLessonModalComponent
   ],
   imports: [
     BrowserModule,

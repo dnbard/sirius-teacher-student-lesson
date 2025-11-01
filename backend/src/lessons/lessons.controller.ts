@@ -12,14 +12,22 @@ import {
 import { LessonsService } from './lessons.service';
 import { CreateLessonDto } from './dto/create-lesson.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { Lesson } from '../users/entities/lesson.entity';
 
 @Controller()
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class LessonsController {
   constructor(private readonly lessonsService: LessonsService) {}
+
+  @Get('lessons')
+  @Roles(UserRole.ADMIN)
+  async getAllLessons(): Promise<Lesson[]> {
+    return this.lessonsService.findAll();
+  }
 
   @Post('lesson')
   @HttpCode(HttpStatus.CREATED)

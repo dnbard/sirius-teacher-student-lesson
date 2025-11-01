@@ -239,6 +239,25 @@
       box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
     }
   }
+
+  &.btn-add-lesson {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      stroke: white;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+  }
 }
 
 .users-table-card {
@@ -562,6 +581,179 @@
   }
 }
 
+// Lessons Table Styles
+.lessons-table-card {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-top: 30px;
+  overflow: hidden;
+
+  .card-header {
+    padding: 30px;
+    border-bottom: 1px solid #e1e8ed;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    h3 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #333;
+      margin: 0 0 8px 0;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #666;
+      margin: 0;
+    }
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+}
+
+.lessons-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background: #f8f9fa;
+
+    tr {
+      th {
+        padding: 16px 30px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #e1e8ed;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      transition: background-color 0.2s ease;
+      border-bottom: 1px solid #f1f3f5;
+
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 20px 30px;
+        color: #333;
+        font-size: 15px;
+
+        .name-cell {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+
+          .user-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            svg {
+              width: 20px;
+              height: 20px;
+              stroke-width: 2;
+            }
+
+            &.teacher-icon {
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              
+              svg {
+                stroke: white;
+              }
+            }
+
+            &.student-icon {
+              background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+              
+              svg {
+                stroke: white;
+              }
+            }
+          }
+
+          .user-name {
+            font-weight: 600;
+            color: #333;
+          }
+        }
+
+        &.date-cell {
+          font-weight: 500;
+          color: #555;
+        }
+
+        &.duration-cell {
+          font-weight: 600;
+          color: #667eea;
+        }
+
+        .status-badge {
+          display: inline-block;
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 13px;
+          font-weight: 600;
+          text-transform: capitalize;
+
+          &.status-pending {
+            background: #fff3cd;
+            color: #856404;
+          }
+
+          &.status-approved {
+            background: #d1ecf1;
+            color: #0c5460;
+          }
+
+          &.status-scheduled {
+            background: #e2e3e5;
+            color: #383d41;
+          }
+
+          &.status-in_progress {
+            background: #cce5ff;
+            color: #004085;
+          }
+
+          &.status-completed {
+            background: #d4edda;
+            color: #155724;
+          }
+
+          &.status-cancelled {
+            background: #f8d7da;
+            color: #721c24;
+          }
+        }
+      }
+    }
+  }
+}
+
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -668,6 +860,57 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 6px;
+      }
+    }
+  }
+
+  .lessons-table-card {
+    .card-header {
+      padding: 20px;
+
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      h3 {
+        font-size: 18px;
+      }
+
+      .btn-add-lesson {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .lessons-table {
+    thead tr th {
+      padding: 12px 15px;
+      font-size: 11px;
+    }
+
+    tbody tr td {
+      padding: 15px;
+      font-size: 14px;
+
+      &.date-cell {
+        font-size: 13px;
+      }
+
+      .name-cell {
+        gap: 8px;
+
+        .user-icon {
+          width: 32px;
+          height: 32px;
+
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
       }
     }
   }

@@ -3,9 +3,11 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TeachersService } from '../../services/teachers.service';
 import { StudentsService } from '../../services/students.service';
+import { LessonsService } from '../../services/lessons.service';
 import { User, UserRole } from '../../models/user.model';
 import { Teacher } from '../../models/teacher.model';
 import { Student } from '../../models/student.model';
+import { Lesson } from '../../models/lesson.model';
 import { forkJoin } from 'rxjs';
 
 interface UserTableRow {
@@ -25,16 +27,19 @@ interface UserTableRow {
 export class DashboardComponent implements OnInit {
   currentUser: User | null = null;
   usersTableData: UserTableRow[] = [];
+  lessons: Lesson[] = [];
   loading: boolean = false;
   UserRole = UserRole;
   showAddUserModal: boolean = false;
   showAssignStudentModal: boolean = false;
+  showAddLessonModal: boolean = false;
   selectedTeacher: UserTableRow | null = null;
 
   constructor(
     private authService: AuthService,
     private teachersService: TeachersService,
     private studentsService: StudentsService,
+    private lessonsService: LessonsService,
     private router: Router
   ) {}
 
@@ -42,9 +47,10 @@ export class DashboardComponent implements OnInit {
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
       
-      // Load teachers and students only for admin users
+      // Load teachers, students, and lessons only for admin users
       if (user?.role === UserRole.ADMIN) {
         this.loadUsersData();
+        this.loadLessons();
       }
     });
   }
@@ -87,6 +93,65 @@ export class DashboardComponent implements OnInit {
     return [...teacherRows, ...studentRows];
   }
 
+  loadLessons(): void {
+    this.loading = true;
+    
+    this.lessonsService.getAll().subscribe({
+      next: (lessons) => {
+        this.lessons = lessons;
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading lessons:', error);
+        this.loading = false;
+      }
+    });
+  }
+
+  getLessonDuration(lesson: Lesson): string {
+    const start = new Date(lesson.startTime);
+    const end = new Date(lesson.endTime);
+    const durationMs = end.getTime() - start.getTime();
+    const hours = Math.floor(durationMs / (1000 * 60 * 60));
+    const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
+  }
+
+  formatLessonDate(lesson: Lesson): string {
+    const start = new Date(lesson.startTime);
+    const end = new Date(lesson.endTime);
+    
+    const dateStr = start.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+    
+    const startTime = start.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    const endTime = end.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    return `${dateStr} ${startTime} - ${endTime}`;
+  }
+
+  get teachersForModal(): UserTableRow[] {
+    return this.usersTableData.filter(u => u.role === 'teacher');
+  }
+
+  get studentsForModal(): UserTableRow[] {
+    return this.usersTableData.filter(u => u.role === 'student');
+  }
+
   openAddUserModal(): void {
     this.showAddUserModal = true;
   }
@@ -114,6 +179,19 @@ export class DashboardComponent implements OnInit {
     // Reload data to show updated student assignments
     console.log('Student assigned successfully');
     this.loadUsersData();
+  }
+
+  openAddLessonModal(): void {
+    this.showAddLessonModal = true;
+  }
+
+  closeAddLessonModal(): void {
+    this.showAddLessonModal = false;
+  }
+
+  onLessonCreated(): void {
+    console.log('Lesson created successfully');
+    this.loadLessons();
   }
 
   deleteUser(user: UserTableRow): void {

@@ -122,5 +122,12 @@ export class LessonsService {
 
     return lesson;
   }
+
+  async findAll(): Promise<Lesson[]> {
+    return this.lessonsRepository.find({
+      relations: ['teacher', 'student', 'teacher.user', 'student.user'],
+      order: { startTime: 'DESC' },
+    });
+  }
 }
 

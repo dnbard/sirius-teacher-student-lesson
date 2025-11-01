@@ -5,6 +5,7 @@ import { DashboardComponent } from './dashboard.component';
 import { AuthService } from '../../services/auth.service';
 import { TeachersService } from '../../services/teachers.service';
 import { StudentsService } from '../../services/students.service';
+import { LessonsService } from '../../services/lessons.service';
 import { User, UserRole } from '../../models/user.model';
 import { Teacher } from '../../models/teacher.model';
 import { Student } from '../../models/student.model';
@@ -15,6 +16,7 @@ describe('DashboardComponent', () => {
   let authService: jasmine.SpyObj<AuthService>;
   let teachersService: jasmine.SpyObj<TeachersService>;
   let studentsService: jasmine.SpyObj<StudentsService>;
+  let lessonsService: jasmine.SpyObj<LessonsService>;
   let router: jasmine.SpyObj<Router>;
   let currentUserSubject: BehaviorSubject<User | null>;
 
@@ -67,6 +69,7 @@ describe('DashboardComponent', () => {
 
     const teachersServiceSpy = jasmine.createSpyObj('TeachersService', ['getAll', 'delete']);
     const studentsServiceSpy = jasmine.createSpyObj('StudentsService', ['getAll', 'delete']);
+    const lessonsServiceSpy = jasmine.createSpyObj('LessonsService', ['getAll']);
 
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
@@ -76,6 +79,7 @@ describe('DashboardComponent', () => {
         { provide: AuthService, useValue: authServiceSpy },
         { provide: TeachersService, useValue: teachersServiceSpy },
         { provide: StudentsService, useValue: studentsServiceSpy },
+        { provide: LessonsService, useValue: lessonsServiceSpy },
         { provide: Router, useValue: routerSpy },
       ],
     }).compileComponents();
@@ -85,6 +89,7 @@ describe('DashboardComponent', () => {
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     teachersService = TestBed.inject(TeachersService) as jasmine.SpyObj<TeachersService>;
     studentsService = TestBed.inject(StudentsService) as jasmine.SpyObj<StudentsService>;
+    lessonsService = TestBed.inject(LessonsService) as jasmine.SpyObj<LessonsService>;
     router = TestBed.inject(Router) as jasmine.SpyObj<Router>;
     
     // Don't call detectChanges yet - let each test control when to do that
@@ -117,6 +122,7 @@ describe('DashboardComponent', () => {
       const mockAdmin = createMockUser(UserRole.ADMIN);
       teachersService.getAll.and.returnValue(of([]));
       studentsService.getAll.and.returnValue(of([]));
+      lessonsService.getAll.and.returnValue(of([]));
       
       currentUserSubject.next(mockAdmin);
       
@@ -155,6 +161,7 @@ describe('DashboardComponent', () => {
       const mockUser = createMockUser(UserRole.ADMIN);
       teachersService.getAll.and.returnValue(of([]));
       studentsService.getAll.and.returnValue(of([]));
+      lessonsService.getAll.and.returnValue(of([]));
       
       currentUserSubject.next(mockUser);
       
@@ -174,6 +181,7 @@ describe('DashboardComponent', () => {
 
       teachersService.getAll.and.returnValue(of(mockTeachers));
       studentsService.getAll.and.returnValue(of(mockStudents));
+      lessonsService.getAll.and.returnValue(of([]));
 
       currentUserSubject.next(mockAdmin);
       component.ngOnInit();
@@ -191,6 +199,7 @@ describe('DashboardComponent', () => {
 
       teachersService.getAll.and.returnValue(of(mockTeachers));
       studentsService.getAll.and.returnValue(of(mockStudents));
+      lessonsService.getAll.and.returnValue(of([]));
 
       currentUserSubject.next(mockAdmin);
       component.ngOnInit();
@@ -217,6 +226,7 @@ describe('DashboardComponent', () => {
 
       teachersService.getAll.and.returnValue(of(mockTeachers));
       studentsService.getAll.and.returnValue(of([]));
+      lessonsService.getAll.and.returnValue(of([]));
 
       currentUserSubject.next(mockAdmin);
       component.ngOnInit();
@@ -233,6 +243,7 @@ describe('DashboardComponent', () => {
 
       teachersService.getAll.and.returnValue(of([]));
       studentsService.getAll.and.returnValue(of(mockStudents));
+      lessonsService.getAll.and.returnValue(of([]));
 
       currentUserSubject.next(mockAdmin);
       component.ngOnInit();
@@ -251,6 +262,7 @@ describe('DashboardComponent', () => {
 
       teachersService.getAll.and.returnValue(of(mockTeachers));
       studentsService.getAll.and.returnValue(of(mockStudents));
+      lessonsService.getAll.and.returnValue(of([]));
       teachersService.delete.and.returnValue(of(void 0));
 
       currentUserSubject.next(mockAdmin);
@@ -320,6 +332,7 @@ describe('DashboardComponent', () => {
 
       teachersService.getAll.and.returnValue(of(mockTeachers));
       studentsService.getAll.and.returnValue(of(mockStudents));
+      lessonsService.getAll.and.returnValue(of([]));
 
       currentUserSubject.next(mockAdmin);
       component.ngOnInit();
