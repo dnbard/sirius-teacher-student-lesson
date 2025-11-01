@@ -12,6 +12,7 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { TeachersService } from './teachers.service';
+import { AssignmentsService } from '../assignments/assignments.service';
 import { CreateTeacherDto } from '../users/dto/create-teacher.dto';
 import { UpdateTeacherDto } from '../users/dto/update-teacher.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -20,11 +21,15 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { Teacher } from '../users/entities/teacher.entity';
+import { Student } from '../users/entities/student.entity';
 
 @Controller('teachers')
 @UseGuards(JwtAuthGuard)
 export class TeachersController {
-  constructor(private readonly teachersService: TeachersService) {}
+  constructor(
+    private readonly teachersService: TeachersService,
+    private readonly assignmentsService: AssignmentsService,
+  ) {}
 
   @Post()
   @UseGuards(RolesGuard)
@@ -37,6 +42,21 @@ export class TeachersController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<Teacher> {
     return this.teachersService.findOne(id);
+  }
+
+  @Get(':id/students')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.TEACHER)
+  async getStudents(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+  ): Promise<Student[]> {
+    // Check if user is admin or the same teacher
+    if (user.role !== UserRole.ADMIN && user.userId !== id) {
+      throw new ForbiddenException('You can only view your own students');
+    }
+
+    return this.assignmentsService.findStudentsByTeacher(id);
   }
 
   @Post(':id')

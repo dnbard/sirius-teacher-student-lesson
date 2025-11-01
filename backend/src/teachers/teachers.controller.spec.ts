@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ForbiddenException } from '@nestjs/common';
 import { TeachersController } from './teachers.controller';
 import { TeachersService } from './teachers.service';
+import { AssignmentsService } from '../assignments/assignments.service';
 import { CreateTeacherDto } from '../users/dto/create-teacher.dto';
 import { UpdateTeacherDto } from '../users/dto/update-teacher.dto';
 import { UserRole } from '../users/entities/user.entity';
@@ -10,6 +11,7 @@ import { Teacher } from '../users/entities/teacher.entity';
 describe('TeachersController', () => {
   let controller: TeachersController;
   let service: TeachersService;
+  let assignmentsService: AssignmentsService;
 
   const mockTeacher: Teacher = {
     id: '123e4567-e89b-12d3-a456-426614174000',
@@ -34,6 +36,11 @@ describe('TeachersController', () => {
     remove: jest.fn(),
   };
 
+  const mockAssignmentsService = {
+    create: jest.fn(),
+    findStudentsByTeacher: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [TeachersController],
@@ -42,11 +49,16 @@ describe('TeachersController', () => {
           provide: TeachersService,
           useValue: mockTeachersService,
         },
+        {
+          provide: AssignmentsService,
+          useValue: mockAssignmentsService,
+        },
       ],
     }).compile();
 
     controller = module.get<TeachersController>(TeachersController);
     service = module.get<TeachersService>(TeachersService);
+    assignmentsService = module.get<AssignmentsService>(AssignmentsService);
   });
 
   afterEach(() => {
@@ -205,6 +217,69 @@ describe('TeachersController', () => {
       await controller.remove(mockTeacher.id);
 
       expect(service.remove).toHaveBeenCalledWith(mockTeacher.id);
+    });
+  });
+
+  describe('getStudents', () => {
+    const mockStudents = [
+      {
+        id: 'student-1',
+        instrument: 'Violin',
+        user: {
+          id: 'student-1',
+          firstName: 'Student',
+          lastName: 'One',
+          email: 'student1@example.com',
+          password: 'hashedPassword',
+          role: UserRole.STUDENT,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      },
+    ];
+
+    it('should return students when user is admin', async () => {
+      const adminUser = {
+        userId: 'admin-id',
+        email: 'admin@example.com',
+        role: UserRole.ADMIN,
+      };
+
+      mockAssignmentsService.findStudentsByTeacher.mockResolvedValue(mockStudents);
+
+      const result = await controller.getStudents(mockTeacher.id, adminUser);
+
+      expect(result).toEqual(mockStudents);
+      expect(assignmentsService.findStudentsByTeacher).toHaveBeenCalledWith(mockTeacher.id);
+    });
+
+    it('should return students when user is the same teacher', async () => {
+      const teacherUser = {
+        userId: mockTeacher.id,
+        email: 'john@example.com',
+        role: UserRole.TEACHER,
+      };
+
+      mockAssignmentsService.findStudentsByTeacher.mockResolvedValue(mockStudents);
+
+      const result = await controller.getStudents(mockTeacher.id, teacherUser);
+
+      expect(result).toEqual(mockStudents);
+      expect(assignmentsService.findStudentsByTeacher).toHaveBeenCalledWith(mockTeacher.id);
+    });
+
+    it('should throw ForbiddenException when user is different teacher', async () => {
+      const differentTeacherUser = {
+        userId: 'different-teacher-id',
+        email: 'different@example.com',
+        role: UserRole.TEACHER,
+      };
+
+      await expect(
+        controller.getStudents(mockTeacher.id, differentTeacherUser),
+      ).rejects.toThrow(ForbiddenException);
+
+      expect(assignmentsService.findStudentsByTeacher).not.toHaveBeenCalled();
     });
   });
 });
