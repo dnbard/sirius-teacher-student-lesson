@@ -220,6 +220,25 @@
       box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
     }
   }
+
+  &.btn-add-user {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      stroke: white;
+    }
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+  }
 }
 
 .users-table-card {
@@ -232,6 +251,13 @@
   .card-header {
     padding: 30px;
     border-bottom: 1px solid #e1e8ed;
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
 
     h3 {
       font-size: 22px;
@@ -540,8 +566,19 @@
     .card-header {
       padding: 20px;
 
+      .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
       h3 {
         font-size: 18px;
+      }
+
+      .btn-add-user {
+        width: 100%;
+        justify-content: center;
       }
     }
   }

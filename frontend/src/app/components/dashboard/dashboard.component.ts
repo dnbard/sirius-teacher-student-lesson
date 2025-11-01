@@ -26,6 +26,7 @@ export class DashboardComponent implements OnInit {
   usersTableData: UserTableRow[] = [];
   loading: boolean = false;
   UserRole = UserRole;
+  showAddUserModal: boolean = false;
 
   constructor(
     private authService: AuthService,
@@ -80,6 +81,18 @@ export class DashboardComponent implements OnInit {
     }));
 
     return [...teacherRows, ...studentRows];
+  }
+
+  openAddUserModal(): void {
+    this.showAddUserModal = true;
+  }
+
+  closeAddUserModal(): void {
+    this.showAddUserModal = false;
+  }
+
+  onUserCreated(): void {
+    this.loadUsersData();
   }
 
   deleteUser(user: UserTableRow): void {

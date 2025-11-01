@@ -1,0 +1,136 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Add New User</h2>
+      <button class="close-btn" (click)="onClose()" type="button">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <div class="alert alert-error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="firstName">First Name <span class="required">*</span></label>
+            <input
+              type="text"
+              id="firstName"
+              formControlName="firstName"
+              [class.error]="userForm.get('firstName')?.touched && userForm.get('firstName')?.invalid"
+              placeholder="Enter first name"
+            />
+            <div class="error-message" *ngIf="userForm.get('firstName')?.touched && userForm.get('firstName')?.hasError('required')">
+              First name is required
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="lastName">Last Name <span class="required">*</span></label>
+            <input
+              type="text"
+              id="lastName"
+              formControlName="lastName"
+              [class.error]="userForm.get('lastName')?.touched && userForm.get('lastName')?.invalid"
+              placeholder="Enter last name"
+            />
+            <div class="error-message" *ngIf="userForm.get('lastName')?.touched && userForm.get('lastName')?.hasError('required')">
+              Last name is required
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email <span class="required">*</span></label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            [class.error]="userForm.get('email')?.touched && userForm.get('email')?.invalid"
+            placeholder="Enter email address"
+          />
+          <div class="error-message" *ngIf="userForm.get('email')?.touched && userForm.get('email')?.hasError('required')">
+            Email is required
+          </div>
+          <div class="error-message" *ngIf="userForm.get('email')?.touched && userForm.get('email')?.hasError('email')">
+            Please enter a valid email address
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password <span class="required">*</span></label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            [class.error]="userForm.get('password')?.touched && userForm.get('password')?.invalid"
+            placeholder="Enter password (min 8 characters)"
+          />
+          <div class="error-message" *ngIf="userForm.get('password')?.touched && userForm.get('password')?.hasError('required')">
+            Password is required
+          </div>
+          <div class="error-message" *ngIf="userForm.get('password')?.touched && userForm.get('password')?.hasError('minlength')">
+            Password must be at least 8 characters long
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role <span class="required">*</span></label>
+          <select id="role" formControlName="role">
+            <option value="teacher">Teacher</option>
+            <option value="student">Student</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="instrument">Instrument <span class="required">*</span></label>
+          <input
+            type="text"
+            id="instrument"
+            formControlName="instrument"
+            [class.error]="userForm.get('instrument')?.touched && userForm.get('instrument')?.invalid"
+            placeholder="Enter instrument"
+          />
+          <div class="error-message" *ngIf="userForm.get('instrument')?.touched && userForm.get('instrument')?.hasError('required')">
+            Instrument is required
+          </div>
+        </div>
+
+        <div class="form-group" *ngIf="isTeacher">
+          <label for="experience">Experience (years) <span class="required">*</span></label>
+          <input
+            type="number"
+            id="experience"
+            formControlName="experience"
+            [class.error]="userForm.get('experience')?.touched && userForm.get('experience')?.invalid"
+            placeholder="Enter years of experience"
+            min="0"
+          />
+          <div class="error-message" *ngIf="userForm.get('experience')?.touched && userForm.get('experience')?.hasError('required')">
+            Experience is required for teachers
+          </div>
+          <div class="error-message" *ngIf="userForm.get('experience')?.touched && userForm.get('experience')?.hasError('min')">
+            Experience must be 0 or greater
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">Create User</span>
+          <span *ngIf="isSubmitting">Creating...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

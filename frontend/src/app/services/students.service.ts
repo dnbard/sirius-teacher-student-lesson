@@ -24,6 +24,12 @@ export class StudentsService {
     });
   }
 
+  create(data: { firstName: string; lastName: string; email: string; password: string; instrument: string }): Observable<Student> {
+    return this.http.post<Student>(this.apiUrl, data, {
+      withCredentials: true
+    });
+  }
+
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`, {
       withCredentials: true
