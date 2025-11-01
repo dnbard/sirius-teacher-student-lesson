@@ -4,6 +4,8 @@ import { Repository, DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { Teacher } from '../users/entities/teacher.entity';
 import { User, UserRole } from '../users/entities/user.entity';
+import { Student } from '../users/entities/student.entity';
+import { Assignment } from '../users/entities/assignment.entity';
 import { CreateTeacherDto } from '../users/dto/create-teacher.dto';
 import { UpdateTeacherDto } from '../users/dto/update-teacher.dto';
 
@@ -14,6 +16,8 @@ export class TeachersService {
     private teachersRepository: Repository<Teacher>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Assignment)
+    private assignmentsRepository: Repository<Assignment>,
     private dataSource: DataSource,
   ) {}
 
@@ -69,9 +73,26 @@ export class TeachersService {
   }
 
   async findAll(): Promise<Teacher[]> {
-    return this.teachersRepository.find({
+    const teachers = await this.teachersRepository.find({
       relations: ['user'],
     });
+
+    // Fetch students for each teacher
+    const teachersWithStudents = await Promise.all(
+      teachers.map(async (teacher) => {
+        const assignments = await this.assignmentsRepository.find({
+          where: { teacherId: teacher.id },
+          relations: ['student', 'student.user'],
+        });
+        
+        return {
+          ...teacher,
+          students: assignments.map(assignment => assignment.student),
+        };
+      }),
+    );
+
+    return teachersWithStudents as any;
   }
 
   async findOne(id: string): Promise<Teacher> {
@@ -84,7 +105,16 @@ export class TeachersService {
       throw new NotFoundException(`Teacher with ID ${id} not found`);
     }
 
-    return teacher;
+    // Fetch students for this teacher
+    const assignments = await this.assignmentsRepository.find({
+      where: { teacherId: teacher.id },
+      relations: ['student', 'student.user'],
+    });
+
+    return {
+      ...teacher,
+      students: assignments.map(assignment => assignment.student),
+    } as any;
   }
 
   async update(id: string, updateTeacherDto: UpdateTeacherDto): Promise<Teacher> {

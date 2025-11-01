@@ -41,6 +41,7 @@ describe('DashboardComponent', () => {
     },
     instrument: 'Piano',
     experience: 5,
+    students: [],
   });
 
   const createMockStudent = (id: string, firstName: string, lastName: string): Student => ({
@@ -312,12 +313,29 @@ describe('DashboardComponent', () => {
       expect(component.selectedTeacher).toBeNull();
     });
 
-    it('should log success message when student is assigned', () => {
+    it('should reload data when student is assigned', () => {
+      const mockAdmin = createMockUser(UserRole.ADMIN);
+      const mockTeachers = [createMockTeacher('1', 'John', 'Doe')];
+      const mockStudents = [createMockStudent('2', 'Jane', 'Smith')];
+
+      teachersService.getAll.and.returnValue(of(mockTeachers));
+      studentsService.getAll.and.returnValue(of(mockStudents));
+
+      currentUserSubject.next(mockAdmin);
+      component.ngOnInit();
+      fixture.detectChanges();
+
+      // Reset spy call counts
+      teachersService.getAll.calls.reset();
+      studentsService.getAll.calls.reset();
+
       spyOn(console, 'log');
 
       component.onStudentAssigned();
 
       expect(console.log).toHaveBeenCalledWith('Student assigned successfully');
+      expect(teachersService.getAll).toHaveBeenCalled();
+      expect(studentsService.getAll).toHaveBeenCalled();
     });
   });
 });

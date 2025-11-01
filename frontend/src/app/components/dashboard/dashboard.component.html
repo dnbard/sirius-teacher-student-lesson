@@ -87,6 +87,7 @@
               <th>Name</th>
               <th>Role</th>
               <th>Instrument</th>
+              <th>Assigned Students</th>
               <th class="actions-column">Actions</th>
             </tr>
           </thead>
@@ -122,6 +123,22 @@
                   </span>
                 </div>
               </td>
+              <td>
+                <div class="students-cell" *ngIf="user.role === 'teacher'">
+                  <span class="students-count" *ngIf="user.students && user.students.length > 0">
+                    {{ user.students.length }} {{ user.students.length === 1 ? 'student' : 'students' }}
+                  </span>
+                  <span class="students-list" *ngIf="user.students && user.students.length > 0">
+                    <span class="student-name" *ngFor="let student of user.students; let last = last">
+                      {{ student.user.firstName }} {{ student.user.lastName }}<span *ngIf="!last">, </span>
+                    </span>
+                  </span>
+                  <span class="no-students" *ngIf="!user.students || user.students.length === 0">
+                    No students
+                  </span>
+                </div>
+                <span *ngIf="user.role === 'student'">—</span>
+              </td>
               <td class="actions-cell">
                 <button 
                   *ngIf="user.role === 'teacher'" 
@@ -135,7 +152,7 @@
                     <line x1="20" y1="8" x2="20" y2="14"></line>
                     <line x1="23" y1="11" x2="17" y2="11"></line>
                   </svg>
-                  Assign Student
+                  Assign
                 </button>
                 <button class="btn-action btn-delete" (click)="deleteUser(user)" [disabled]="loading" title="Delete {{ user.role }}">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

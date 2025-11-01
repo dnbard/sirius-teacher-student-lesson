@@ -14,6 +14,7 @@ interface UserTableRow {
   role: 'teacher' | 'student';
   instrument: string;
   experience?: number;
+  students?: Student[];
 }
 
 @Component({
@@ -72,7 +73,8 @@ export class DashboardComponent implements OnInit {
       name: `${teacher.user.firstName} ${teacher.user.lastName}`,
       role: 'teacher' as const,
       instrument: teacher.instrument,
-      experience: teacher.experience
+      experience: teacher.experience,
+      students: teacher.students || []
     }));
 
     const studentRows: UserTableRow[] = students.map(student => ({
@@ -109,8 +111,9 @@ export class DashboardComponent implements OnInit {
   }
 
   onStudentAssigned(): void {
-    // Optionally, you could reload data or show a success message
+    // Reload data to show updated student assignments
     console.log('Student assigned successfully');
+    this.loadUsersData();
   }
 
   deleteUser(user: UserTableRow): void {

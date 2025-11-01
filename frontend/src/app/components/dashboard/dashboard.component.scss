@@ -425,6 +425,39 @@
           }
         }
 
+        .students-cell {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+
+          .students-count {
+            display: inline-block;
+            padding: 4px 10px;
+            background: #f3e5f5;
+            color: #7b1fa2;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            width: fit-content;
+          }
+
+          .students-list {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+
+            .student-name {
+              color: #555;
+            }
+          }
+
+          .no-students {
+            font-size: 13px;
+            color: #999;
+            font-style: italic;
+          }
+        }
+
         &.actions-cell {
           text-align: center;
           

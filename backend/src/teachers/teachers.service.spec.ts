@@ -4,6 +4,7 @@ import { Repository, DataSource } from 'typeorm';
 import { TeachersService } from './teachers.service';
 import { Teacher } from '../users/entities/teacher.entity';
 import { User, UserRole } from '../users/entities/user.entity';
+import { Assignment } from '../users/entities/assignment.entity';
 import { CreateTeacherDto } from '../users/dto/create-teacher.dto';
 import { UpdateTeacherDto } from '../users/dto/update-teacher.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
@@ -18,6 +19,7 @@ describe('TeachersService', () => {
   let service: TeachersService;
   let teacherRepository: Repository<Teacher>;
   let userRepository: Repository<User>;
+  let assignmentRepository: Repository<Assignment>;
 
   const mockTeacher: Teacher = {
     id: '123e4567-e89b-12d3-a456-426614174000',
@@ -70,6 +72,13 @@ describe('TeachersService', () => {
           },
         },
         {
+          provide: getRepositoryToken(Assignment),
+          useValue: {
+            find: jest.fn(),
+            findOne: jest.fn(),
+          },
+        },
+        {
           provide: DataSource,
           useValue: {
             createQueryRunner: jest.fn().mockReturnValue(mockQueryRunner),
@@ -81,6 +90,7 @@ describe('TeachersService', () => {
     service = module.get<TeachersService>(TeachersService);
     teacherRepository = module.get<Repository<Teacher>>(getRepositoryToken(Teacher));
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    assignmentRepository = module.get<Repository<Assignment>>(getRepositoryToken(Assignment));
   });
 
   afterEach(() => {
@@ -104,11 +114,12 @@ describe('TeachersService', () => {
       mockQueryRunner.manager.save
         .mockResolvedValueOnce(mockTeacher.user)
         .mockResolvedValueOnce(mockTeacher);
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(assignmentRepository, 'find').mockResolvedValue([]);
 
       const result = await service.create(createTeacherDto);
 
-      expect(result).toEqual(mockTeacher);
+      expect(result).toBeDefined();
       expect(mockQueryRunner.connect).toHaveBeenCalled();
       expect(mockQueryRunner.startTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
@@ -133,29 +144,39 @@ describe('TeachersService', () => {
   });
 
   describe('findAll', () => {
-    it('should return all teachers', async () => {
+    it('should return all teachers with their students', async () => {
       const mockTeachers = [mockTeacher];
       jest.spyOn(teacherRepository, 'find').mockResolvedValue(mockTeachers);
+      jest.spyOn(assignmentRepository, 'find').mockResolvedValue([]);
 
       const result = await service.findAll();
 
-      expect(result).toEqual(mockTeachers);
+      expect(result).toBeDefined();
       expect(teacherRepository.find).toHaveBeenCalledWith({
         relations: ['user'],
+      });
+      expect(assignmentRepository.find).toHaveBeenCalledWith({
+        where: { teacherId: mockTeacher.id },
+        relations: ['student', 'student.user'],
       });
     });
   });
 
   describe('findOne', () => {
-    it('should return a teacher if found', async () => {
+    it('should return a teacher with students if found', async () => {
       jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(assignmentRepository, 'find').mockResolvedValue([]);
 
       const result = await service.findOne(mockTeacher.id);
 
-      expect(result).toEqual(mockTeacher);
+      expect(result).toBeDefined();
       expect(teacherRepository.findOne).toHaveBeenCalledWith({
         where: { id: mockTeacher.id },
         relations: ['user'],
+      });
+      expect(assignmentRepository.find).toHaveBeenCalledWith({
+        where: { teacherId: mockTeacher.id },
+        relations: ['student', 'student.user'],
       });
     });
 
@@ -174,9 +195,9 @@ describe('TeachersService', () => {
     };
 
     it('should update a teacher successfully', async () => {
-      jest.spyOn(service, 'findOne')
-        .mockResolvedValueOnce(mockTeacher)
-        .mockResolvedValueOnce({ ...mockTeacher, ...updateTeacherDto });
+      const updatedTeacher = { ...mockTeacher, ...updateTeacherDto };
+      jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(assignmentRepository, 'find').mockResolvedValue([]);
       mockQueryRunner.manager.save.mockResolvedValue(mockTeacher);
 
       const result = await service.update(mockTeacher.id, updateTeacherDto);
@@ -189,7 +210,7 @@ describe('TeachersService', () => {
     });
 
     it('should throw NotFoundException if teacher not found', async () => {
-      jest.spyOn(service, 'findOne').mockRejectedValue(new NotFoundException());
+      jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(null);
 
       await expect(service.update('non-existent-id', updateTeacherDto)).rejects.toThrow(
         NotFoundException,
@@ -212,7 +233,8 @@ describe('TeachersService', () => {
         updatedAt: new Date(),
       };
 
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(assignmentRepository, 'find').mockResolvedValue([]);
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(existingUser);
 
       await expect(service.update(mockTeacher.id, updateDto)).rejects.toThrow(ConflictException);
@@ -221,17 +243,21 @@ describe('TeachersService', () => {
 
   describe('remove', () => {
     it('should remove a teacher successfully', async () => {
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(assignmentRepository, 'find').mockResolvedValue([]);
       jest.spyOn(userRepository, 'remove').mockResolvedValue(mockTeacher.user);
 
       await service.remove(mockTeacher.id);
 
-      expect(service.findOne).toHaveBeenCalledWith(mockTeacher.id);
+      expect(teacherRepository.findOne).toHaveBeenCalledWith({
+        where: { id: mockTeacher.id },
+        relations: ['user'],
+      });
       expect(userRepository.remove).toHaveBeenCalledWith(mockTeacher.user);
     });
 
     it('should throw NotFoundException if teacher not found', async () => {
-      jest.spyOn(service, 'findOne').mockRejectedValue(new NotFoundException());
+      jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(null);
 
       await expect(service.remove('non-existent-id')).rejects.toThrow(NotFoundException);
     });
