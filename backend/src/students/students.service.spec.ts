@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
-import { TeachersService } from './teachers.service';
-import { Teacher } from '../users/entities/teacher.entity';
+import { StudentsService } from './students.service';
+import { Student } from '../users/entities/student.entity';
 import { User, UserRole } from '../users/entities/user.entity';
-import { CreateTeacherDto } from '../users/dto/create-teacher.dto';
-import { UpdateTeacherDto } from '../users/dto/update-teacher.dto';
+import { CreateStudentDto } from '../users/dto/create-student.dto';
+import { UpdateStudentDto } from '../users/dto/update-student.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
 // Mock bcrypt module
@@ -14,22 +14,21 @@ jest.mock('bcrypt', () => ({
   compare: jest.fn().mockResolvedValue(true),
 }));
 
-describe('TeachersService', () => {
-  let service: TeachersService;
-  let teacherRepository: Repository<Teacher>;
+describe('StudentsService', () => {
+  let service: StudentsService;
+  let studentRepository: Repository<Student>;
   let userRepository: Repository<User>;
 
-  const mockTeacher: Teacher = {
+  const mockStudent: Student = {
     id: '123e4567-e89b-12d3-a456-426614174000',
     instrument: 'Piano',
-    experience: 5,
     user: {
       id: '123e4567-e89b-12d3-a456-426614174000',
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@example.com',
+      firstName: 'Alice',
+      lastName: 'Smith',
+      email: 'alice@example.com',
       password: 'hashedPassword',
-      role: UserRole.TEACHER,
+      role: UserRole.STUDENT,
       createdAt: new Date(),
       updatedAt: new Date(),
     },
@@ -49,9 +48,9 @@ describe('TeachersService', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
-        TeachersService,
+        StudentsService,
         {
-          provide: getRepositoryToken(Teacher),
+          provide: getRepositoryToken(Student),
           useValue: {
             create: jest.fn(),
             save: jest.fn(),
@@ -77,8 +76,8 @@ describe('TeachersService', () => {
       ],
     }).compile();
 
-    service = module.get<TeachersService>(TeachersService);
-    teacherRepository = module.get<Repository<Teacher>>(getRepositoryToken(Teacher));
+    service = module.get<StudentsService>(StudentsService);
+    studentRepository = module.get<Repository<Student>>(getRepositoryToken(Student));
     userRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
@@ -87,27 +86,26 @@ describe('TeachersService', () => {
   });
 
   describe('create', () => {
-    const createTeacherDto: CreateTeacherDto = {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'john@example.com',
+    const createStudentDto: CreateStudentDto = {
+      firstName: 'Alice',
+      lastName: 'Smith',
+      email: 'alice@example.com',
       password: 'password123',
       instrument: 'Piano',
-      experience: 5,
     };
 
-    it('should create a teacher successfully', async () => {
+    it('should create a student successfully', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
-      jest.spyOn(userRepository, 'create').mockReturnValue(mockTeacher.user);
-      jest.spyOn(teacherRepository, 'create').mockReturnValue(mockTeacher);
+      jest.spyOn(userRepository, 'create').mockReturnValue(mockStudent.user);
+      jest.spyOn(studentRepository, 'create').mockReturnValue(mockStudent);
       mockQueryRunner.manager.save
-        .mockResolvedValueOnce(mockTeacher.user)
-        .mockResolvedValueOnce(mockTeacher);
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockTeacher);
+        .mockResolvedValueOnce(mockStudent.user)
+        .mockResolvedValueOnce(mockStudent);
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockStudent);
 
-      const result = await service.create(createTeacherDto);
+      const result = await service.create(createStudentDto);
 
-      expect(result).toEqual(mockTeacher);
+      expect(result).toEqual(mockStudent);
       expect(mockQueryRunner.connect).toHaveBeenCalled();
       expect(mockQueryRunner.startTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.commitTransaction).toHaveBeenCalled();
@@ -115,56 +113,55 @@ describe('TeachersService', () => {
     });
 
     it('should throw ConflictException if email already exists', async () => {
-      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockTeacher.user);
+      jest.spyOn(userRepository, 'findOne').mockResolvedValue(mockStudent.user);
 
-      await expect(service.create(createTeacherDto)).rejects.toThrow(ConflictException);
+      await expect(service.create(createStudentDto)).rejects.toThrow(ConflictException);
     });
 
     it('should rollback transaction on error', async () => {
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(null);
-      jest.spyOn(userRepository, 'create').mockReturnValue(mockTeacher.user);
+      jest.spyOn(userRepository, 'create').mockReturnValue(mockStudent.user);
       mockQueryRunner.manager.save.mockRejectedValue(new Error('Database error'));
 
-      await expect(service.create(createTeacherDto)).rejects.toThrow('Database error');
+      await expect(service.create(createStudentDto)).rejects.toThrow('Database error');
       expect(mockQueryRunner.rollbackTransaction).toHaveBeenCalled();
       expect(mockQueryRunner.release).toHaveBeenCalled();
     });
   });
 
   describe('findOne', () => {
-    it('should return a teacher if found', async () => {
-      jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(mockTeacher);
+    it('should return a student if found', async () => {
+      jest.spyOn(studentRepository, 'findOne').mockResolvedValue(mockStudent);
 
-      const result = await service.findOne(mockTeacher.id);
+      const result = await service.findOne(mockStudent.id);
 
-      expect(result).toEqual(mockTeacher);
-      expect(teacherRepository.findOne).toHaveBeenCalledWith({
-        where: { id: mockTeacher.id },
+      expect(result).toEqual(mockStudent);
+      expect(studentRepository.findOne).toHaveBeenCalledWith({
+        where: { id: mockStudent.id },
         relations: ['user'],
       });
     });
 
-    it('should throw NotFoundException if teacher not found', async () => {
-      jest.spyOn(teacherRepository, 'findOne').mockResolvedValue(null);
+    it('should throw NotFoundException if student not found', async () => {
+      jest.spyOn(studentRepository, 'findOne').mockResolvedValue(null);
 
       await expect(service.findOne('non-existent-id')).rejects.toThrow(NotFoundException);
     });
   });
 
   describe('update', () => {
-    const updateTeacherDto: UpdateTeacherDto = {
+    const updateStudentDto: UpdateStudentDto = {
       firstName: 'Jane',
       instrument: 'Guitar',
-      experience: 10,
     };
 
-    it('should update a teacher successfully', async () => {
+    it('should update a student successfully', async () => {
       jest.spyOn(service, 'findOne')
-        .mockResolvedValueOnce(mockTeacher)
-        .mockResolvedValueOnce({ ...mockTeacher, ...updateTeacherDto });
-      mockQueryRunner.manager.save.mockResolvedValue(mockTeacher);
+        .mockResolvedValueOnce(mockStudent)
+        .mockResolvedValueOnce({ ...mockStudent, ...updateStudentDto });
+      mockQueryRunner.manager.save.mockResolvedValue(mockStudent);
 
-      const result = await service.update(mockTeacher.id, updateTeacherDto);
+      const result = await service.update(mockStudent.id, updateStudentDto);
 
       expect(result).toBeDefined();
       expect(mockQueryRunner.connect).toHaveBeenCalled();
@@ -173,49 +170,49 @@ describe('TeachersService', () => {
       expect(mockQueryRunner.release).toHaveBeenCalled();
     });
 
-    it('should throw NotFoundException if teacher not found', async () => {
+    it('should throw NotFoundException if student not found', async () => {
       jest.spyOn(service, 'findOne').mockRejectedValue(new NotFoundException());
 
-      await expect(service.update('non-existent-id', updateTeacherDto)).rejects.toThrow(
+      await expect(service.update('non-existent-id', updateStudentDto)).rejects.toThrow(
         NotFoundException,
       );
     });
 
     it('should throw ConflictException if email already exists', async () => {
-      const updateDto: UpdateTeacherDto = {
+      const updateDto: UpdateStudentDto = {
         email: 'existing@example.com',
       };
 
       const existingUser: User = {
         id: 'different-id',
         firstName: 'Jane',
-        lastName: 'Smith',
+        lastName: 'Doe',
         email: 'existing@example.com',
         password: 'hashedPassword',
-        role: UserRole.TEACHER,
+        role: UserRole.STUDENT,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
 
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockTeacher);
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockStudent);
       jest.spyOn(userRepository, 'findOne').mockResolvedValue(existingUser);
 
-      await expect(service.update(mockTeacher.id, updateDto)).rejects.toThrow(ConflictException);
+      await expect(service.update(mockStudent.id, updateDto)).rejects.toThrow(ConflictException);
     });
   });
 
   describe('remove', () => {
-    it('should remove a teacher successfully', async () => {
-      jest.spyOn(service, 'findOne').mockResolvedValue(mockTeacher);
-      jest.spyOn(userRepository, 'remove').mockResolvedValue(mockTeacher.user);
+    it('should remove a student successfully', async () => {
+      jest.spyOn(service, 'findOne').mockResolvedValue(mockStudent);
+      jest.spyOn(userRepository, 'remove').mockResolvedValue(mockStudent.user);
 
-      await service.remove(mockTeacher.id);
+      await service.remove(mockStudent.id);
 
-      expect(service.findOne).toHaveBeenCalledWith(mockTeacher.id);
-      expect(userRepository.remove).toHaveBeenCalledWith(mockTeacher.user);
+      expect(service.findOne).toHaveBeenCalledWith(mockStudent.id);
+      expect(userRepository.remove).toHaveBeenCalledWith(mockStudent.user);
     });
 
-    it('should throw NotFoundException if teacher not found', async () => {
+    it('should throw NotFoundException if student not found', async () => {
       jest.spyOn(service, 'findOne').mockRejectedValue(new NotFoundException());
 
       await expect(service.remove('non-existent-id')).rejects.toThrow(NotFoundException);

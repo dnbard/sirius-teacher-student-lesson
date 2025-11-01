@@ -7,6 +7,7 @@ import { getTypeOrmConfig } from './typeorm.config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { TeachersModule } from './teachers/teachers.module';
+import { StudentsModule } from './students/students.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { TeachersModule } from './teachers/teachers.module';
     UsersModule,
     AuthModule,
     TeachersModule,
+    StudentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
