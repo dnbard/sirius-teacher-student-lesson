@@ -39,6 +39,22 @@
         </div>
       </div>
     </div>
+
+    <div class="notice-card" *ngIf="currentUser?.role === 'student' || currentUser?.role === 'teacher'">
+      <div class="notice-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </div>
+      <div class="notice-content">
+        <h3>Dashboard In Progress</h3>
+        <p>We're working hard to bring you an amazing dashboard experience!</p>
+        <p>Currently, full dashboard functionality is available only for <strong>admin users</strong>. Student and Teacher dashboards are under active development and will be available soon.</p>
+        <p class="notice-footer">Thank you for your patience! 🎵</p>
+      </div>
+    </div>
   </main>
 </div>
 

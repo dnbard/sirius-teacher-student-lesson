@@ -142,6 +142,65 @@
   }
 }
 
+.notice-card {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 10px;
+  padding: 30px;
+  margin-top: 30px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  color: white;
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+
+  .notice-icon {
+    flex-shrink: 0;
+    
+    svg {
+      width: 48px;
+      height: 48px;
+      stroke: white;
+      opacity: 0.9;
+    }
+  }
+
+  .notice-content {
+    flex: 1;
+
+    h3 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 15px 0;
+      color: white;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      margin: 0 0 12px 0;
+      color: rgba(255, 255, 255, 0.95);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      strong {
+        font-weight: 700;
+        color: white;
+      }
+    }
+
+    .notice-footer {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      font-style: italic;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+  }
+}
+
 .btn {
   padding: 10px 20px;
   border: none;
@@ -189,6 +248,29 @@
   .welcome-section {
     h2 {
       font-size: 24px;
+    }
+  }
+
+  .notice-card {
+    flex-direction: column;
+    padding: 20px;
+    gap: 15px;
+
+    .notice-icon {
+      svg {
+        width: 36px;
+        height: 36px;
+      }
+    }
+
+    .notice-content {
+      h3 {
+        font-size: 20px;
+      }
+
+      p {
+        font-size: 14px;
+      }
     }
   }
 }
