@@ -3,4 +3,5 @@ dist
 .angular
 *.log
 .DS_Store
+coverage
 

@@ -1,25 +1,27 @@
-name: CI - Backend Tests
+name: CI - Tests
 
 on:
   push:
     branches: [ main, develop ]
     paths:
       - 'backend/**'
+      - 'frontend/**'
       - '.github/workflows/ci.yml'
   pull_request:
     branches: [ main, develop ]
     paths:
       - 'backend/**'
+      - 'frontend/**'
       - '.github/workflows/ci.yml'
 
 jobs:
-  test:
-    name: Run Backend Tests
+  backend-tests:
+    name: Backend Tests
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
+        node-version: [20.x]
 
     steps:
       - name: Checkout code
@@ -43,3 +45,30 @@ jobs:
       - name: Run tests with coverage
         working-directory: ./backend
         run: npm run test:cov
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Run tests with coverage
+        working-directory: ./frontend
+        run: npm run test:frontend:cov
