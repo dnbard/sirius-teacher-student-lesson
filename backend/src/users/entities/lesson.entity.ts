@@ -3,6 +3,8 @@ import { Teacher } from './teacher.entity';
 import { Student } from './student.entity';
 
 export enum LessonStatus {
+  PENDING = 'pending',
+  APPROVED = 'approved',
   SCHEDULED = 'scheduled',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
